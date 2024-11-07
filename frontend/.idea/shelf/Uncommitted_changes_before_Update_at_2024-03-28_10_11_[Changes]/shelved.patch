@@ -1,0 +1,269 @@
+Index: src/components/signUpCard.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import {\r\n    Card,\r\n    CardBody,\r\n    CardFooter,\r\n    Typography,\r\n    Input,\r\n    Button,\r\n} from \"@material-tailwind/react\";\r\nimport logo from '../assets/logo.png';\r\nimport {useEffect, useState} from \"react\";\r\nimport api from \"../services/api\";\r\nimport axios from \"axios\";\r\nimport * as ValidEmail from 'email-validator';\r\nimport {useNavigate} from \"react-router-dom\";\r\n\r\n\r\nexport function SignUpCard() {\r\n\r\n    const navigate = useNavigate();\r\n\r\n    const [userName , setUserName] = useState(\"\");\r\n    const [userFirstName , setUserFirstName] = useState(\"\");\r\n    const [userEmail , setUserEmail] = useState(\"\");\r\n    const [userPassword , setUserPassword] = useState(\"\");\r\n    const [confirmPwd , setConfirmPwd] = useState(\"\");\r\n    const [submit, setSubmit] = useState(false);\r\n\r\n    const [validName, setValidName] = useState(false);\r\n    const [validFirstName, setValidFirstName] = useState(false);\r\n    const [validEmail, setValidEmail] = useState(false)\r\n    const [matchPwd, setMatchPwd] = useState(false);\r\n    const [validPwd, setValidPwd] = useState(false);\r\n\r\n    const regex = /^[^0-9!@#$%^&*()_+={}[\\]:;\"'<>,.?/|\\\\`~-][^!@#$%^&*()_+={}[\\]:;\"'<>,.?/|\\\\`~-]*$/;\r\n    const regexPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$/;\r\n\r\n    useEffect(() => {\r\n            setValidName(regex.test(userName));\r\n            setValidFirstName(regex.test(userFirstName));\r\n            setValidEmail(ValidEmail.validate(userEmail));\r\n            setMatchPwd(userPassword == confirmPwd);\r\n            setValidPwd(regexPwd.test(userPassword) && userPassword == confirmPwd);\r\n    },\r\n        [userName,userFirstName,userEmail,userPassword,confirmPwd]);\r\n\r\n    const submitSignUp =  () => {\r\n        if (validName && validFirstName && validEmail && validPwd && matchPwd) {\r\n            axios.post(api.endpoints.user.signup,{\r\n                firstName: userFirstName,\r\n                lastName: userName,\r\n                email: userEmail,\r\n                password: userPassword\r\n            }).then((res) => {\r\n                if (res.status === 200) {\r\n                    navigate(\"/\");\r\n                } else {\r\n                    console.log(res.status);\r\n                }\r\n            })\r\n            .catch((error) => {\r\n                console.error(\"Error sign-in request :\", error);\r\n            });\r\n\r\n        }\r\n        else\r\n            console.log(\"user no valid\")\r\n    }\r\n    return (\r\n        <>\r\n        <Card\r\n            placeholder={undefined}\r\n        >\r\n            <CardBody\r\n                placeholder={undefined}\r\n                className=\"flex flex-col gap-4 items-center h-full\"\r\n            >\r\n                <div className=\"w-1/2 flex justify-center\">\r\n                    <img src={logo} alt=\"Logo\" className=\"object-contain\"/>\r\n                </div>\r\n\r\n                <Input\r\n                    variant=\"outlined\"\r\n                    crossOrigin={undefined}\r\n                    placeholder={undefined}\r\n                    label=\"First Name\"\r\n                    size=\"lg\"\r\n                    onChange={e => setUserFirstName(e.target.value)}\r\n                    error={!validFirstName && submit}\r\n                />\r\n\r\n                <Input\r\n                    crossOrigin={undefined}\r\n                    placeholder={undefined}\r\n                    label=\"Last Name\" size=\"lg\"\r\n                    onChange={e => setUserName(e.target.value)}\r\n                    error={!validName && submit}\r\n\r\n                />\r\n                <Input\r\n                    crossOrigin={undefined}\r\n                    placeholder={undefined}\r\n                    label=\"Email\" size=\"lg\"\r\n                    type=\"email\"\r\n                    onChange={e => setUserEmail(e.target.value)}\r\n                    error={!validEmail && submit}\r\n\r\n\r\n                />\r\n                <Input\r\n                    crossOrigin={undefined}\r\n                    placeholder={undefined}\r\n                    label=\"Password\"\r\n                    type=\"password\"\r\n                    size=\"lg\"\r\n                    onChange={e => setUserPassword(e.target.value)}\r\n                    error={!validPwd && submit}\r\n                />\r\n                <div className=\"w-[32rem]\">\r\n                    <Input\r\n                        crossOrigin={undefined}\r\n                        placeholder={undefined}\r\n                        label=\"Confirm password\"\r\n                        type=\"password\"\r\n                        size=\"lg\"\r\n                        onChange={e => setConfirmPwd(e.target.value)}\r\n                        error={!validPwd && submit}\r\n                    />\r\n                    <Typography\r\n                        placeholder={undefined}\r\n                        variant=\"small\"\r\n                        color={!validPwd && submit?\"red\":\"gray\"}\r\n                        className=\"mt-2 flex items-center gap-1 font-normal\"\r\n                    >\r\n                        <svg\r\n                            xmlns=\"http://www.w3.org/2000/svg\"\r\n                            viewBox=\"0 0 24 24\"\r\n                            fill=\"currentColor\"\r\n                            className=\"-mt-px h-4 w-4\"\r\n                        >\r\n                            <path\r\n                                fillRule=\"evenodd\"\r\n                                d=\"M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 01.67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 11-.671-1.34l.041-.022zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5z\"\r\n                                clipRule=\"evenodd\"\r\n                            />\r\n                        </svg>\r\n                        {matchPwd || !submit?\"Use at least 8 characters, one uppercase, one lowercase and one number.\":\"Passwords do not match\"}\r\n                    </Typography>\r\n\r\n                </div>\r\n\r\n                    <div className=\"flex-grow\"></div>\r\n            </CardBody>\r\n\r\n            <CardFooter\r\n                placeholder={undefined}\r\n                className=\"pt-0\"\r\n            >\r\n                <Button placeholder={undefined} variant=\"gradient\" fullWidth onClick={()=> {setSubmit(true); submitSignUp() } }>\r\n                    Sign Up\r\n                </Button>\r\n\r\n            </CardFooter>\r\n        </Card>\r\n        </>\r\n\r\n    );\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/components/signUpCard.tsx b/src/components/signUpCard.tsx
+--- a/src/components/signUpCard.tsx	(revision 0cf25956035dce49086f351d09909ca97da71daf)
++++ b/src/components/signUpCard.tsx	(date 1711634327086)
+@@ -38,8 +38,8 @@
+             setValidName(regex.test(userName));
+             setValidFirstName(regex.test(userFirstName));
+             setValidEmail(ValidEmail.validate(userEmail));
+-            setMatchPwd(userPassword == confirmPwd);
+-            setValidPwd(regexPwd.test(userPassword) && userPassword == confirmPwd);
++            setMatchPwd(userPassword === confirmPwd);
++            setValidPwd(regexPwd.test(userPassword) && userPassword === confirmPwd);
+     },
+         [userName,userFirstName,userEmail,userPassword,confirmPwd]);
+ 
+Index: src/components/footer.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { Typography } from \"@material-tailwind/react\";\r\nimport {useNavigate} from \"react-router-dom\";\r\nimport React from \"react\";\r\n\r\nexport function Footer() {\r\n\r\n    const navigate = useNavigate();\r\n\r\n    return (\r\n        <footer className=\"w-full mt-auto bg-white p-5\">\r\n            <div\r\n                className=\"flex flex-row flex-wrap items-center justify-center gap-y-6 gap-x-12 bg-white text-center md:justify-between\">\r\n                <Typography placeholder={undefined} color=\"blue-gray\" className=\"text-center font-normal\">\r\n                    &copy; 2023 - Tehnime\r\n                </Typography>\r\n                <ul className=\"flex flex-wrap items-center gap-y-2 gap-x-8\">\r\n                    <li>\r\n                        <Typography placeholder={undefined}\r\n                                    as=\"a\"\r\n                                    href=\"#\"\r\n                                    color=\"blue-gray\"\r\n                                    className=\"font-normal transition-colors hover:text-blue-500 focus:text-blue-500\"\r\n                        >\r\n                            About Us\r\n                        </Typography>\r\n                    </li>\r\n                    <li>\r\n                        <Typography placeholder={undefined}\r\n                                    as=\"a\"\r\n                                    href=\"#\"\r\n                                    color=\"blue-gray\"\r\n                                    className=\"font-normal transition-colors hover:text-blue-500 focus:text-blue-500\"\r\n                        >\r\n                            License\r\n                        </Typography>\r\n                    </li>\r\n                    <li>\r\n                        <Typography placeholder={undefined}\r\n                                    as=\"a\"\r\n                                    href=\"#\"\r\n                                    color=\"blue-gray\"\r\n                                    className=\"font-normal transition-colors hover:text-blue-500 focus:text-blue-500\"\r\n                        >\r\n                            Contribute\r\n                        </Typography>\r\n                    </li>\r\n                    <li>\r\n                        <Typography placeholder={undefined}\r\n                                    as=\"a\"\r\n                                    href=\"#\"\r\n                                    color=\"blue-gray\"\r\n                                    className=\"font-normal transition-colors hover:text-blue-500 focus:text-blue-500\"\r\n                        >\r\n                            Contact Us\r\n                        </Typography>\r\n                    </li>\r\n                </ul>\r\n            </div>\r\n        </footer>\r\n    );\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/components/footer.tsx b/src/components/footer.tsx
+--- a/src/components/footer.tsx	(revision 0cf25956035dce49086f351d09909ca97da71daf)
++++ b/src/components/footer.tsx	(date 1711634235880)
+@@ -1,11 +1,7 @@
+ import { Typography } from "@material-tailwind/react";
+-import {useNavigate} from "react-router-dom";
+ import React from "react";
+ 
+ export function Footer() {
+-
+-    const navigate = useNavigate();
+-
+     return (
+         <footer className="w-full mt-auto bg-white p-5">
+             <div
+Index: src/pages/dashboard.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import React, { useEffect, useState } from \"react\";\r\nimport API from \"../services/api\";\r\nimport CarouselBody from \"../components/carouselBody\";\r\nimport  Header  from \"../components/header\";\r\nimport { Footer } from \"../components/footer\";\r\nimport CarouselWithContent from \"../components/mainCarousel\";\r\nimport TrendingPeak from \"../components/trendingPeak\";\r\nimport {useLocation, useNavigate} from \"react-router-dom\";\r\nimport {Loading} from \"./loading\";\r\nimport NotFound from \"./notFound\";\r\n\r\nconst DashBoard: React.FC = () => {\r\n    const location = useLocation();\r\n    const navigate = useNavigate();\r\n\r\n    const user = location.state;\r\n\r\n    const [popular, setPopular] = useState<any>([]);\r\n    const [recent, setRecent] = useState<any>([]);\r\n    const [topAiring, setTopAiring] = useState<any>([]);\r\n    const [trending, setTrending] = useState<any>([]);\r\n\r\n    useEffect(() => {\r\n\r\n        if (user === null || user === undefined) {\r\n            navigate(\"/\");\r\n        }\r\n        const fetchLanding = async () => {\r\n            const landing = await API.getLandingData();\r\n            setPopular(landing?.data?.popular);\r\n            setRecent(landing?.data?.recent);\r\n            setTopAiring(landing?.data?.topAiring);\r\n            setTrending(landing?.data?.trending);\r\n            console.log(location);\r\n        };\r\n\r\n        fetchLanding();\r\n    }, []);\r\n\r\n    if (trending.length === 0)\r\n        return <Loading />\r\n\r\n    return (\r\n        <div>\r\n            <Header user={location?.state}/>\r\n            <CarouselWithContent trendingAnimes={trending} />\r\n            \r\n            <div>\r\n                <CarouselBody animeList={popular} title={\"The Popular ones\"} subtitle={\"Check out the latest popular anime favorites!\"} user={user}/>\r\n                <TrendingPeak trendingAnime={trending[Math.floor(Math.random() * trending.length)]}/>\r\n                <CarouselBody animeList={recent} title={\"Recent Releases\"} subtitle={\"Explore the newest anime releases now!\"} user={user}/>\r\n                <TrendingPeak trendingAnime={trending[Math.floor(Math.random() * trending.length)]}/>\r\n                <CarouselBody animeList={topAiring} title={\"On The Air Right Now\"} subtitle={\"Catch the top airing anime series everyone's talking about!\"} user={user}/>\r\n            </div>\r\n\r\n            <Footer />\r\n        </div>\r\n    );\r\n};\r\nexport default DashBoard;\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/pages/dashboard.tsx b/src/pages/dashboard.tsx
+--- a/src/pages/dashboard.tsx	(revision 0cf25956035dce49086f351d09909ca97da71daf)
++++ b/src/pages/dashboard.tsx	(date 1711634270342)
+@@ -7,7 +7,6 @@
+ import TrendingPeak from "../components/trendingPeak";
+ import {useLocation, useNavigate} from "react-router-dom";
+ import {Loading} from "./loading";
+-import NotFound from "./notFound";
+ 
+ const DashBoard: React.FC = () => {
+     const location = useLocation();
+Index: src/components/loginCard.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import {\r\n    Card,\r\n    CardBody,\r\n    CardFooter,\r\n    Typography,\r\n    Input,\r\n    Button,\r\n    Alert\r\n} from \"@material-tailwind/react\";\r\nimport logo from '../assets/logo.png';\r\nimport {useState} from \"react\";\r\nimport API from \"../services/api\";\r\nimport {useNavigate} from \"react-router-dom\";\r\n\r\nfunction Icon() {\r\n    return (\r\n        <svg\r\n            xmlns=\"http://www.w3.org/2000/svg\"\r\n            viewBox=\"0 0 24 24\"\r\n            fill=\"currentColor\"\r\n            className=\"h-6 w-6\"\r\n        >\r\n            <path\r\n                fillRule=\"evenodd\"\r\n                d=\"M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z\"\r\n                clipRule=\"evenodd\"\r\n            />\r\n        </svg>\r\n    );\r\n}\r\n\r\nfunction IncorrectPassword({setError}: any) {\r\n    const [open, setOpen] = useState(true);\r\n    return (\r\n        <>\r\n            <Alert\r\n                variant=\"gradient\"\r\n                open={open}\r\n                icon={<Icon />}\r\n                color=\"red\"\r\n                action={\r\n                    <Button\r\n                        placeholder={undefined}\r\n                        variant=\"text\"\r\n                        color=\"white\"\r\n                        size=\"sm\"\r\n                        className=\"!absolute top-3 right-3\"\r\n                        onClick={() => {\r\n                            setOpen(false);\r\n                            setError(false);\r\n                        }}\r\n                    >\r\n                        Close\r\n                    </Button>\r\n                }\r\n            >\r\n                Incorrect email or password !\r\n            </Alert>\r\n        </>\r\n    );\r\n}\r\n\r\nexport function LoginCard() {\r\n    const navigate = useNavigate();\r\n\r\n    const [email, setEmail] = useState(\"\");\r\n    const [password, setPassword] = useState(\"\");\r\n    const [showError, setShowError] = useState(false);\r\n\r\n    async function login() {\r\n        const loggedIn = await API.userLogin(email, password);\r\n\r\n        console.log(loggedIn);\r\n\r\n        loggedIn.response !== 401 ?\r\n            navigate('/dashboard', {\r\n                state: {\r\n                    user: loggedIn.data\r\n                }\r\n            }) :\r\n            setShowError(true);\r\n    }\r\n\r\n    return (\r\n        <Card \r\n            placeholder={undefined} \r\n        >\r\n            <CardBody\r\n                placeholder={undefined} \r\n                className=\"flex flex-col gap-4 items-center h-full\"\r\n            >\r\n                <div className=\"w-1/2 flex justify-center\">\r\n                    <img src={logo} alt=\"Logo\" className=\"object-contain\" />\r\n                </div>\r\n\r\n                {showError ? <IncorrectPassword setError={setShowError}/> : <div/>}\r\n\r\n                <Input \r\n                    crossOrigin={undefined} \r\n                    placeholder={undefined} \r\n                    label=\"Email\" size=\"lg\"\r\n                    onChange={(ev) => setEmail(ev.target.value)}\r\n                />\r\n                <Input \r\n                    crossOrigin={undefined} \r\n                    placeholder={undefined} \r\n                    label=\"Password\"\r\n                    type=\"password\"\r\n                    size=\"lg\"\r\n                    onChange={(ev) => setPassword(ev.target.value)}\r\n                />\r\n\r\n                <div className=\"flex-grow\"></div>\r\n            </CardBody>\r\n\r\n            <CardFooter \r\n                placeholder={undefined} \r\n                className=\"pt-0\"\r\n            >\r\n                <Button placeholder={undefined} variant=\"gradient\" fullWidth onClick={login}>\r\n                    Sign In\r\n                </Button>\r\n                \r\n                <Typography \r\n                    placeholder={undefined} \r\n                    variant=\"small\" \r\n                    className=\"mt-6 flex justify-center\"\r\n                >\r\n                    Don't have an account?\r\n                    <Typography\r\n                        placeholder={undefined}\r\n                        as=\"a\"\r\n                        href=\"#signup\"\r\n                        variant=\"small\"\r\n                        color=\"blue-gray\"\r\n                        className=\"ml-1 font-bold\"\r\n                    >\r\n                        Sign up\r\n                    </Typography>\r\n                </Typography>\r\n                \r\n                <Typography \r\n                    placeholder={undefined} \r\n                    variant=\"small\" \r\n                    className=\"flex justify-center\"\r\n                >\r\n                    Forgot your password?\r\n                    <Typography\r\n                        placeholder={undefined}\r\n                        as=\"a\"\r\n                        href=\"#signup\"\r\n                        variant=\"small\"\r\n                        color=\"blue-gray\"\r\n                        className=\"ml-1 font-bold\"\r\n                    >\r\n                        Forgot password\r\n                    </Typography>\r\n                </Typography>\r\n            </CardFooter>\r\n        </Card>\r\n    );\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/components/loginCard.tsx b/src/components/loginCard.tsx
+--- a/src/components/loginCard.tsx	(revision 0cf25956035dce49086f351d09909ca97da71daf)
++++ b/src/components/loginCard.tsx	(date 1711634940695)
+@@ -130,10 +130,10 @@
+                     <Typography
+                         placeholder={undefined}
+                         as="a"
+-                        href="#signup"
+                         variant="small"
+                         color="blue-gray"
+-                        className="ml-1 font-bold"
++                        className="hover: cursor-pointer ml-1 font-bold"
++                        onClick={() => navigate("/sign-up")}
+                     >
+                         Sign up
+                     </Typography>
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"cdaf188f-53e2-42f6-ad31-1992ffbad801\" name=\"Changes\" comment=\"Completed dashboard.&#10;&#10;Completed dashboard.\">\r\n      <change beforePath=\"$PROJECT_DIR$/../backend/src/main/java/com/tehnime/backend/utils/Response.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/../backend/src/main/java/com/tehnime/backend/utils/Response.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/components/loginCard.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/components/loginCard.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/pages/dashboard.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/pages/dashboard.tsx\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"TypeScript JSX File\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$/..\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 8\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2ciyGhBZtaLbdGu9oQyLhlGx9Rf\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;main&quot;,\r\n    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,\r\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\r\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/hasil/IdeaProject/hanime&quot;,\r\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,\r\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\r\n    &quot;npm.npm start.executor&quot;: &quot;Run&quot;,\r\n    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,\r\n    &quot;ts.external.directory.path&quot;: &quot;C:\\\\Users\\\\hasil\\\\IdeaProjects\\\\Projet-Application-Web\\\\tehnime\\\\frontend\\\\node_modules\\\\typescript\\\\lib&quot;,\r\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\r\n  }\r\n}</component>\r\n  <component name=\"RunManager\" selected=\"npm.npm start\">\r\n    <configuration name=\"Debug Application\" type=\"JavascriptDebugType\" uri=\"http://localhost:3000\">\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"npm start\" type=\"js.build_tools.npm\">\r\n      <package-json value=\"$PROJECT_DIR$/package.json\" />\r\n      <command value=\"run\" />\r\n      <scripts>\r\n        <script value=\"start\" />\r\n      </scripts>\r\n      <node-interpreter value=\"project\" />\r\n      <envs />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"cdaf188f-53e2-42f6-ad31-1992ffbad801\" name=\"Changes\" comment=\"\" />\r\n      <created>1708608601909</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1708608601909</updated>\r\n      <workItem from=\"1708608603037\" duration=\"1488000\" />\r\n      <workItem from=\"1708626524465\" duration=\"44000\" />\r\n      <workItem from=\"1709179173345\" duration=\"1288000\" />\r\n      <workItem from=\"1709247485920\" duration=\"317000\" />\r\n      <workItem from=\"1709582090262\" duration=\"179000\" />\r\n      <workItem from=\"1709816414787\" duration=\"110000\" />\r\n      <workItem from=\"1709816531022\" duration=\"11698000\" />\r\n      <workItem from=\"1710091468378\" duration=\"3824000\" />\r\n      <workItem from=\"1710127486895\" duration=\"8689000\" />\r\n      <workItem from=\"1710310056088\" duration=\"1739000\" />\r\n      <workItem from=\"1710355279491\" duration=\"42000\" />\r\n      <workItem from=\"1710386669232\" duration=\"920000\" />\r\n      <workItem from=\"1710396343293\" duration=\"2332000\" />\r\n      <workItem from=\"1710575819372\" duration=\"2308000\" />\r\n      <workItem from=\"1710765139536\" duration=\"4451000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"Created frontend project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708608842810</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708608842810</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"Fixed issues with description page\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1709824714309</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1709824714309</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"Completed dashboard.&#10;&#10;Completed dashboard.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1710765294103</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1710765294103</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"4\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n    <MESSAGE value=\"Created frontend project\" />\r\n    <MESSAGE value=\"Fixed issues with description page\" />\r\n    <MESSAGE value=\"Completed dashboard.&#10;&#10;Completed dashboard.\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Completed dashboard.&#10;&#10;Completed dashboard.\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 0cf25956035dce49086f351d09909ca97da71daf)
++++ b/.idea/workspace.xml	(date 1711634825452)
+@@ -4,10 +4,12 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="cdaf188f-53e2-42f6-ad31-1992ffbad801" name="Changes" comment="Completed dashboard.&#10;&#10;Completed dashboard.">
+-      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/com/tehnime/backend/utils/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/com/tehnime/backend/utils/Response.java" afterDir="false" />
++    <list default="true" id="cdaf188f-53e2-42f6-ad31-1992ffbad801" name="Changes" comment="Fixed issues with description page">
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-03-28_09_52_[Changes]/shelved.patch" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/components/footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/footer.tsx" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/components/loginCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/loginCard.tsx" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/components/signUpCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/signUpCard.tsx" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/pages/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/dashboard.tsx" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+@@ -24,6 +26,20 @@
+   </component>
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
++  </component>
++  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
++  "lastFilter": {
++    "state": "OPEN",
++    "assignee": "TommySpag"
++  }
++}]]></component>
++  <component name="GithubPullRequestsUISettings">
++    <option name="selectedUrlAndAccountId">
++      <UrlAndAccount>
++        <option name="accountId" value="b1fd62de-d844-47e1-8e4e-3886e9848025" />
++        <option name="url" value="https://github.com/TommySpag/tehnime.git" />
++      </UrlAndAccount>
++    </option>
+   </component>
+   <component name="MarkdownSettingsMigration">
+     <option name="stateVersion" value="1" />
+@@ -48,7 +64,7 @@
+     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+-    &quot;last_opened_file_path&quot;: &quot;C:/Users/hasil/IdeaProject/hanime&quot;,
++    &quot;last_opened_file_path&quot;: &quot;C:/Users/2247070/IdeaProjects/tehnime/frontend&quot;,
+     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+@@ -56,11 +72,16 @@
+     &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+     &quot;npm.npm start.executor&quot;: &quot;Run&quot;,
+-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\hasil\\IdeaProjects\\Projet-Application-Web\\tehnime\\frontend\\node_modules\\typescript\\lib&quot;,
++    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
++    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\2247070\\IdeaProjects\\tehnime\\frontend\\node_modules\\typescript\\lib&quot;,
+     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+ }</component>
++  <component name="RecentsManager">
++    <key name="MoveFile.RECENT_KEYS">
++      <recent name="C:\Users\2247070\OneDrive - Cégep Marie-Victorin\Documents\Session4\Tehnime\frontend\src\assets" />
++    </key>
++  </component>
+   <component name="RunManager" selected="npm.npm start">
+     <configuration name="Debug Application" type="JavascriptDebugType" uri="http://localhost:3000">
+       <method v="2" />
+@@ -98,7 +119,10 @@
+       <workItem from="1710386669232" duration="920000" />
+       <workItem from="1710396343293" duration="2332000" />
+       <workItem from="1710575819372" duration="2308000" />
+-      <workItem from="1710765139536" duration="4451000" />
++      <workItem from="1710986987505" duration="4000" />
++      <workItem from="1711022596710" duration="96000" />
++      <workItem from="1711022701253" duration="10094000" />
++      <workItem from="1711627362959" duration="4931000" />
+     </task>
+     <task id="LOCAL-00001" summary="Created frontend project">
+       <option name="closed" value="true" />
+@@ -116,15 +140,7 @@
+       <option name="project" value="LOCAL" />
+       <updated>1709824714309</updated>
+     </task>
+-    <task id="LOCAL-00003" summary="Completed dashboard.&#10;&#10;Completed dashboard.">
+-      <option name="closed" value="true" />
+-      <created>1710765294103</created>
+-      <option name="number" value="00003" />
+-      <option name="presentableId" value="LOCAL-00003" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1710765294103</updated>
+-    </task>
+-    <option name="localTasksCounter" value="4" />
++    <option name="localTasksCounter" value="3" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -134,7 +150,6 @@
+     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+     <MESSAGE value="Created frontend project" />
+     <MESSAGE value="Fixed issues with description page" />
+-    <MESSAGE value="Completed dashboard.&#10;&#10;Completed dashboard." />
+-    <option name="LAST_COMMIT_MESSAGE" value="Completed dashboard.&#10;&#10;Completed dashboard." />
++    <option name="LAST_COMMIT_MESSAGE" value="Fixed issues with description page" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2024-03-28_09_52_[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-03-28_09_52_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-03-28_09_52_[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1711633923428)
++++ b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-03-28_09_52_[Changes]/shelved.patch	(date 1711633923428)
+@@ -0,0 +1,62 @@
++Index: .idea/workspace.xml
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"cdaf188f-53e2-42f6-ad31-1992ffbad801\" name=\"Changes\" comment=\"Fixed issues with description page\">\r\n      <change afterPath=\"$PROJECT_DIR$/src/pages/notFound.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/components/header.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/components/header.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/pages/dashboard.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/pages/dashboard.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/pages/description.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/pages/description.tsx\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/pages/watch.tsx\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/pages/watch.tsx\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"TypeScript JSX File\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$/..\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 8\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2ciyGhBZtaLbdGu9oQyLhlGx9Rf\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ASKED_ADD_EXTERNAL_FILES\": \"true\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"git-widget-placeholder\": \"main\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/2247070/IdeaProjects/tehnime/frontend\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_interpreter_path\": \"node\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"npm.npm start.executor\": \"Run\",\r\n    \"settings.editor.selected.configurable\": \"preferences.pluginManager\",\r\n    \"ts.external.directory.path\": \"C:\\\\Users\\\\2247070\\\\IdeaProjects\\\\tehnime\\\\frontend\\\\node_modules\\\\typescript\\\\lib\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\2247070\\OneDrive - Cégep Marie-Victorin\\Documents\\Session4\\Tehnime\\frontend\\src\\assets\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"npm.npm start\">\r\n    <configuration name=\"Debug Application\" type=\"JavascriptDebugType\" uri=\"http://localhost:3000\">\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"npm start\" type=\"js.build_tools.npm\">\r\n      <package-json value=\"$PROJECT_DIR$/package.json\" />\r\n      <command value=\"run\" />\r\n      <scripts>\r\n        <script value=\"start\" />\r\n      </scripts>\r\n      <node-interpreter value=\"project\" />\r\n      <envs />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"cdaf188f-53e2-42f6-ad31-1992ffbad801\" name=\"Changes\" comment=\"\" />\r\n      <created>1708608601909</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1708608601909</updated>\r\n      <workItem from=\"1708608603037\" duration=\"1488000\" />\r\n      <workItem from=\"1708626524465\" duration=\"44000\" />\r\n      <workItem from=\"1709179173345\" duration=\"1288000\" />\r\n      <workItem from=\"1709247485920\" duration=\"317000\" />\r\n      <workItem from=\"1709582090262\" duration=\"179000\" />\r\n      <workItem from=\"1709816414787\" duration=\"110000\" />\r\n      <workItem from=\"1709816531022\" duration=\"11698000\" />\r\n      <workItem from=\"1710091468378\" duration=\"3824000\" />\r\n      <workItem from=\"1710127486895\" duration=\"8689000\" />\r\n      <workItem from=\"1710310056088\" duration=\"1739000\" />\r\n      <workItem from=\"1710355279491\" duration=\"42000\" />\r\n      <workItem from=\"1710386669232\" duration=\"920000\" />\r\n      <workItem from=\"1710396343293\" duration=\"2332000\" />\r\n      <workItem from=\"1710575819372\" duration=\"2308000\" />\r\n      <workItem from=\"1710986987505\" duration=\"4000\" />\r\n      <workItem from=\"1711022596710\" duration=\"96000\" />\r\n      <workItem from=\"1711022701253\" duration=\"10094000\" />\r\n      <workItem from=\"1711627362959\" duration=\"4931000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"Created frontend project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708608842810</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708608842810</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"Fixed issues with description page\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1709824714309</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1709824714309</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"3\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n    <MESSAGE value=\"Created frontend project\" />\r\n    <MESSAGE value=\"Fixed issues with description page\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Fixed issues with description page\" />\r\n  </component>\r\n</project>
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.idea/workspace.xml b/.idea/workspace.xml
++--- a/.idea/workspace.xml	(revision 2063130ebb86a144ff5c82469a1589a32bcc76b1)
+++++ b/.idea/workspace.xml	(date 1711633902098)
++@@ -4,14 +4,7 @@
++     <option name="autoReloadType" value="SELECTIVE" />
++   </component>
++   <component name="ChangeListManager">
++-    <list default="true" id="cdaf188f-53e2-42f6-ad31-1992ffbad801" name="Changes" comment="Fixed issues with description page">
++-      <change afterPath="$PROJECT_DIR$/src/pages/notFound.tsx" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/src/components/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/header.tsx" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/src/pages/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/dashboard.tsx" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/src/pages/description.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/description.tsx" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/src/pages/watch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/watch.tsx" afterDir="false" />
++-    </list>
+++    <list default="true" id="cdaf188f-53e2-42f6-ad31-1992ffbad801" name="Changes" comment="Updated navigation functionnalities" />
++     <option name="SHOW_DIALOG" value="false" />
++     <option name="HIGHLIGHT_CONFLICTS" value="true" />
++     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
++@@ -108,7 +101,7 @@
++       <workItem from="1710986987505" duration="4000" />
++       <workItem from="1711022596710" duration="96000" />
++       <workItem from="1711022701253" duration="10094000" />
++-      <workItem from="1711627362959" duration="4931000" />
+++      <workItem from="1711627362959" duration="5233000" />
++     </task>
++     <task id="LOCAL-00001" summary="Created frontend project">
++       <option name="closed" value="true" />
++@@ -126,7 +119,15 @@
++       <option name="project" value="LOCAL" />
++       <updated>1709824714309</updated>
++     </task>
++-    <option name="localTasksCounter" value="3" />
+++    <task id="LOCAL-00003" summary="Updated navigation functionnalities">
+++      <option name="closed" value="true" />
+++      <created>1711633641162</created>
+++      <option name="number" value="00003" />
+++      <option name="presentableId" value="LOCAL-00003" />
+++      <option name="project" value="LOCAL" />
+++      <updated>1711633641162</updated>
+++    </task>
+++    <option name="localTasksCounter" value="4" />
++     <servers />
++   </component>
++   <component name="TypeScriptGeneratedFilesManager">
++@@ -136,6 +137,7 @@
++     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
++     <MESSAGE value="Created frontend project" />
++     <MESSAGE value="Fixed issues with description page" />
++-    <option name="LAST_COMMIT_MESSAGE" value="Fixed issues with description page" />
+++    <MESSAGE value="Updated navigation functionnalities" />
+++    <option name="LAST_COMMIT_MESSAGE" value="Updated navigation functionnalities" />
++   </component>
++ </project>
++\ No newline at end of file
